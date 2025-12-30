@@ -1,0 +1,15 @@
+F:\newproj\YoloLabVIEW\DllUse\cpp_dll\csharp_caller\bin\Debug\net8.0\CSharpCaller.exe
+F:\newproj\YoloLabVIEW\DllUse\cpp_dll\csharp_caller\bin\Debug\net8.0\CSharpCaller.deps.json
+F:\newproj\YoloLabVIEW\DllUse\cpp_dll\csharp_caller\bin\Debug\net8.0\CSharpCaller.runtimeconfig.json
+F:\newproj\YoloLabVIEW\DllUse\cpp_dll\csharp_caller\bin\Debug\net8.0\CSharpCaller.dll
+F:\newproj\YoloLabVIEW\DllUse\cpp_dll\csharp_caller\bin\Debug\net8.0\CSharpCaller.pdb
+F:\newproj\YoloLabVIEW\DllUse\cpp_dll\csharp_caller\obj\Debug\net8.0\CSharpCaller.GeneratedMSBuildEditorConfig.editorconfig
+F:\newproj\YoloLabVIEW\DllUse\cpp_dll\csharp_caller\obj\Debug\net8.0\CSharpCaller.AssemblyInfoInputs.cache
+F:\newproj\YoloLabVIEW\DllUse\cpp_dll\csharp_caller\obj\Debug\net8.0\CSharpCaller.AssemblyInfo.cs
+F:\newproj\YoloLabVIEW\DllUse\cpp_dll\csharp_caller\obj\Debug\net8.0\CSharpCaller.csproj.CoreCompileInputs.cache
+F:\newproj\YoloLabVIEW\DllUse\cpp_dll\csharp_caller\obj\Debug\net8.0\CSharpCaller.sourcelink.json
+F:\newproj\YoloLabVIEW\DllUse\cpp_dll\csharp_caller\obj\Debug\net8.0\CSharpCaller.dll
+F:\newproj\YoloLabVIEW\DllUse\cpp_dll\csharp_caller\obj\Debug\net8.0\refint\CSharpCaller.dll
+F:\newproj\YoloLabVIEW\DllUse\cpp_dll\csharp_caller\obj\Debug\net8.0\CSharpCaller.pdb
+F:\newproj\YoloLabVIEW\DllUse\cpp_dll\csharp_caller\obj\Debug\net8.0\CSharpCaller.genruntimeconfig.cache
+F:\newproj\YoloLabVIEW\DllUse\cpp_dll\csharp_caller\obj\Debug\net8.0\ref\CSharpCaller.dll

@@ -39,8 +39,7 @@ namespace CSharpCaller
             string version = Marshal.PtrToStringAnsi(versionPtr);
             Console.WriteLine($"Version: {version}");
             
-            Console.WriteLine("\n按任意鍵退出...");
-            Console.ReadKey();
+            Console.WriteLine("\n測試完成！");
         }
     }
 }
