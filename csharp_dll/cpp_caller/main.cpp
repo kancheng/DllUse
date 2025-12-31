@@ -8,6 +8,7 @@
 // 使用 CLR 支持
 #using <System.dll>
 #using <mscorlib.dll>
+#include <vcclr.h>
 
 using namespace System;
 using namespace System::Reflection;
@@ -40,12 +41,12 @@ std::string GetDllPath()
     if (is64Bit)
     {
         dllDir = baseDir + "\\x64";
-        arch = "64位";
+        arch = "64bit";
     }
     else
     {
         dllDir = baseDir + "\\x86";
-        arch = "32位";
+        arch = "32bit";
     }
     
     std::string dllPath = dllDir + "\\CSharpDLL.dll";
@@ -63,8 +64,8 @@ std::string GetDllPath()
         }
     }
     
-    std::cout << "運行時架構: " << (is64Bit ? "64位" : "32位") << std::endl;
-    std::cout << "使用 DLL: " << dllPath << " (" << arch << ")" << std::endl;
+    std::cout << "Runtime Architecture: " << (is64Bit ? "64-bit" : "32-bit") << std::endl;
+    std::cout << "Using DLL: " << dllPath << " (" << arch << ")" << std::endl;
     std::cout << std::endl;
     
     return dllPath;
@@ -72,7 +73,7 @@ std::string GetDllPath()
 
 int main()
 {
-    std::cout << "=== C++ 調用 C# DLL 範例 ===" << std::endl << std::endl;
+    std::cout << "=== C++ Calling C# DLL Example ===" << std::endl << std::endl;
     
     try
     {
@@ -82,8 +83,8 @@ int main()
         // 檢查文件是否存在
         if (GetFileAttributesA(dllPath.c_str()) == INVALID_FILE_ATTRIBUTES)
         {
-            std::cout << "錯誤: 找不到 DLL: " << dllPath << std::endl;
-            std::cout << "請確保已編譯 C# DLL（運行 build_dll.bat）" << std::endl;
+            std::cout << "Error: Cannot find DLL: " << dllPath << std::endl;
+            std::cout << "Please ensure C# DLL is compiled (run build_dll.bat)" << std::endl;
             return 1;
         }
         
@@ -126,17 +127,28 @@ int main()
         // 調用 GetVersion 方法
         Object^ versionResult = getVersionMethod->Invoke(calcObj, nullptr);
         String^ version = safe_cast<String^>(versionResult);
-        std::cout << "Version: " << std::endl;
-        pin_ptr<const char> versionPtr = PtrToStringChars(version);
-        std::cout << versionPtr << std::endl;
+        pin_ptr<const wchar_t> versionPtr = PtrToStringChars(version);
+        std::wcout << L"Version: " << versionPtr << std::endl;
         
-        std::cout << std::endl << "測試完成！" << std::endl;
+        std::cout << std::endl << "Test completed!" << std::endl;
     }
     catch (Exception^ ex)
     {
-        std::cout << "錯誤: " << std::endl;
-        pin_ptr<const char> errorMsg = PtrToStringChars(ex->Message);
-        std::cout << errorMsg << std::endl;
+        std::wcout << L"Error: ";
+        if (ex != nullptr)
+        {
+            pin_ptr<const wchar_t> errorMsg = PtrToStringChars(ex->Message);
+            std::wcout << errorMsg << std::endl;
+        }
+        else
+        {
+            std::wcout << L"Unknown error" << std::endl;
+        }
+        return 1;
+    }
+    catch (...)
+    {
+        std::cout << "Unknown exception occurred" << std::endl;
         return 1;
     }
     

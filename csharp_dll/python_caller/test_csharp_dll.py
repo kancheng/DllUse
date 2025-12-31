@@ -60,28 +60,60 @@ if not os.path.exists(dll_path):
     sys.exit(1)
 
 # 加載 .NET 程序集
-clr.AddReference(dll_path)
+# pythonnet 需要使用完整路徑
+dll_path_abs = os.path.abspath(dll_path)
 
-# 導入 C# 命名空間和類
-from CSharpDLL import Calculator
+try:
+    # 使用完整路徑加載程序集
+    clr.AddReference(dll_path_abs)
+    from CSharpDLL import Calculator
+    
+    # 創建實例
+    calc = Calculator()
+    
+except Exception as e:
+    # 如果直接導入失敗，使用 System.Reflection
+    try:
+        import System
+        from System.Reflection import Assembly
+        from System import Activator
+        
+        # 加載程序集
+        assembly = Assembly.LoadFrom(dll_path_abs)
+        
+        # 獲取 Calculator 類型
+        calc_type = assembly.GetType("CSharpDLL.Calculator")
+        
+        # 創建實例
+        calc = Activator.CreateInstance(calc_type)
+        
+    except Exception as e2:
+        print(f"錯誤：無法加載 C# DLL")
+        print(f"錯誤信息: {e2}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
 
 if __name__ == "__main__":
     print("=== Python 調用 C# DLL 範例 ===\n")
     
-    # 創建 C# 對象實例
-    calc = Calculator()
-    
-    # 調用 C# 方法
-    result = calc.Add(10, 20)
-    print(f"Add(10, 20) = {result}")
-    
-    result = calc.Subtract(30, 15)
-    print(f"Subtract(30, 15) = {result}")
-    
-    result = calc.Multiply(5, 6)
-    print(f"Multiply(5, 6) = {result}")
-    
-    version = calc.GetVersion()
-    print(f"Version: {version}")
-    
-    print("\n測試完成！")
+    try:
+        # 調用 C# 方法
+        result = calc.Add(10, 20)
+        print(f"Add(10, 20) = {result}")
+        
+        result = calc.Subtract(30, 15)
+        print(f"Subtract(30, 15) = {result}")
+        
+        result = calc.Multiply(5, 6)
+        print(f"Multiply(5, 6) = {result}")
+        
+        version = calc.GetVersion()
+        print(f"Version: {version}")
+        
+        print("\n測試完成！")
+    except Exception as e:
+        print(f"錯誤：調用 C# DLL 時發生異常: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
