@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CSharpCaller")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aec623f40673f5183a0604f6c6fa34cf54f47ee9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+554eb6625298343dbb06e52cc1b13b33c9b9dd65")]
 [assembly: System.Reflection.AssemblyProductAttribute("CSharpCaller")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CSharpCaller")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
