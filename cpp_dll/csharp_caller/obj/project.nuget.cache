@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "cgdObqjmkJc=",
+  "dgSpecHash": "1SZYWyrbqWc=",
   "success": true,
   "projectFilePath": "F:\\newproj\\YoloLabVIEW\\DllUse\\cpp_dll\\csharp_caller\\CSharpCaller.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\Foxconn\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.22\\microsoft.windowsdesktop.app.ref.8.0.22.nupkg.sha512",
     "C:\\Users\\Foxconn\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.22\\microsoft.netcore.app.ref.8.0.22.nupkg.sha512",
+    "C:\\Users\\Foxconn\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.22\\microsoft.windowsdesktop.app.ref.8.0.22.nupkg.sha512",
     "C:\\Users\\Foxconn\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.22\\microsoft.aspnetcore.app.ref.8.0.22.nupkg.sha512",
     "C:\\Users\\Foxconn\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\8.0.22\\microsoft.netcore.app.host.win-x64.8.0.22.nupkg.sha512"
   ],

@@ -6,8 +6,7 @@ echo.
 
 cd /d "%~dp0"
 
-REM 複製 DLL
-copy /Y ..\MyMath.dll . >nul
+REM 注意：不再需要複製 DLL，因為 Program.cs 會自動根據運行時架構選擇 x64 或 x86 目錄中的 DLL
 
 REM 嘗試使用 dotnet 編譯（如果可用）
 where dotnet >nul 2>&1

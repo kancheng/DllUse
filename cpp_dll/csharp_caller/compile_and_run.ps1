@@ -6,9 +6,8 @@ Write-Host ""
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $scriptDir
 
-# 複製 DLL
-Copy-Item ..\MyMath.dll . -Force
-Write-Host "已複製 MyMath.dll" -ForegroundColor Green
+# 注意：不再需要複製 DLL，因為 Program.cs 會自動根據運行時架構選擇 x64 或 x86 目錄中的 DLL
+Write-Host "提示: DLL 會根據運行時架構自動從 x64 或 x86 目錄加載" -ForegroundColor Yellow
 
 # 嘗試使用 Visual Studio 的 csc
 $cscPaths = @(

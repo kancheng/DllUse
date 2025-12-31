@@ -1,28 +1,35 @@
 # CPP_DLL 測試結果
 
 ## 測試日期
-$(Get-Date)
+未指定（需手動更新）
 
 ## 1. DLL 編譯
 
 ### 編譯方法
 使用 Visual Studio 2022 編譯器，通過以下命令編譯：
 
+**64 位版本：**
 ```batch
-cl /LD /MD /O2 /EHsc /DMYMATH_EXPORTS MyMath.cpp /DEF:MyMath.def /Fe:MyMath.dll
+cl /LD /MD /O2 /EHsc /DMYMATH_EXPORTS MyMath.cpp /DEF:MyMath.def /Fe:x64\MyMath.dll
+```
+
+**32 位版本：**
+```batch
+cl /LD /MD /O2 /EHsc /DMYMATH_EXPORTS MyMath.cpp /DEF:MyMath.def /Fe:x86\MyMath.dll
 ```
 
 ### 編譯結果
 - ✅ **編譯成功**
-- 生成文件：
+- 生成文件（分別在 x64 和 x86 目錄中）：
   - `MyMath.dll` - 動態連結庫
   - `MyMath.lib` - 導入庫
   - `MyMath.exp` - 導出文件
   - `MyMath.obj` - 目標文件
 
 ### 編譯腳本
-- `build_dll.bat` - 自動查找 Visual Studio 並編譯
-- `build_simple.bat` - 簡單編譯腳本（需要在 Developer Command Prompt 中運行）
+- `build_dll.bat` - 自動查找 Visual Studio 並編譯 32 位和 64 位版本（推薦）
+- `build_dll.ps1` - PowerShell 版本，自動編譯 32 位和 64 位版本
+- `build_simple.bat` - 簡單編譯腳本（已過時，僅編譯到根目錄，不推薦使用）
 
 ## 2. Python 調用測試
 
@@ -54,10 +61,16 @@ Version: MyMath DLL v1.0.0
 ## 3. C# 調用測試
 
 ### 編譯方法
-使用 Visual Studio 2022 的 C# 編譯器：
+使用 .NET SDK 或 Visual Studio 編譯器：
 
 ```batch
-csc Program.cs /out:Program.exe /platform:x64
+dotnet build --configuration Release
+```
+
+或使用 MSBuild：
+
+```batch
+msbuild CSharpCaller.csproj /p:Configuration=Release /p:Platform=x64
 ```
 
 ### 測試命令
@@ -80,12 +93,12 @@ Version: MyMath DLL v1.0.0
 ```
 
 ### 測試詳情
-- ✅ DLL 加載成功
-- ✅ DllImport 特性正確配置
-- ✅ CallingConvention.Cdecl 正確設置
+- ✅ DLL 加載成功（使用動態加載方式）
+- ✅ 使用 `UnmanagedFunctionPointer` 委託，正確指定 `CallingConvention.Cdecl`
 - ✅ 所有函數調用正常
 - ✅ 整數運算結果正確
 - ✅ 字符串指針轉換正確（使用 Marshal.PtrToStringAnsi）
+- ✅ 支援根據運行時架構自動選擇對應的 DLL（32位/64位）
 
 ## 4. 函數驗證
 
@@ -127,13 +140,17 @@ cpp_dll/
 ├── MyMath.h          # 頭文件
 ├── MyMath.cpp        # 實現文件
 ├── MyMath.def        # 模塊定義文件
-├── MyMath.dll        # 編譯後的 DLL
-├── MyMath.lib        # 導入庫
+├── x64/              # 64 位 DLL 輸出目錄
+│   ├── MyMath.dll
+│   └── MyMath.lib
+├── x86/              # 32 位 DLL 輸出目錄
+│   ├── MyMath.dll
+│   └── MyMath.lib
 ├── python_caller/
 │   └── test_cpp_dll.py  # Python 測試程序
 └── csharp_caller/
     ├── Program.cs       # C# 測試程序
-    └── Program.exe      # 編譯後的執行文件
+    └── CSharpCaller.csproj
 ```
 
 ## 6. 結論

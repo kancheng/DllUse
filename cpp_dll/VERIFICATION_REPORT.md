@@ -1,7 +1,7 @@
 # CPP_DLL 封裝驗證報告
 
 ## 驗證日期
-生成時間：$(Get-Date)
+生成時間：未指定（需手動更新）
 
 ## 1. 源代碼驗證
 
@@ -55,11 +55,12 @@
 - ✅ 正確處理字符串返回值（使用 `decode('utf-8')`）
 
 ### 3.2 C# 調用 (Program.cs)
-- ✅ 使用 `DllImport` 特性導入函數
-- ✅ 正確指定 `CallingConvention.Cdecl`
+- ✅ 使用動態加載方式（`LoadLibrary`/`GetProcAddress`）加載 DLL
+- ✅ 使用 `UnmanagedFunctionPointer` 委託，正確指定 `CallingConvention.Cdecl`
 - ✅ 正確處理字符串返回值：
   - 使用 `IntPtr` 接收指針
   - 使用 `Marshal.PtrToStringAnsi` 轉換為字符串
+- ✅ 支援根據運行時架構自動選擇對應的 DLL（32位/64位）
 
 ## 4. 封裝最佳實踐檢查
 
