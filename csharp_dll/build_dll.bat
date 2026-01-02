@@ -68,15 +68,27 @@ REM 創建符號連結或複製到統一目錄
 if not exist "x64" mkdir x64
 if not exist "x86" mkdir x86
 
-copy /Y "bin\Release\x64\net8.0\CSharpDLL.dll" "x64\" >nul 2>&1
-copy /Y "bin\Release\x64\net8.0\CSharpDLL.runtimeconfig.json" "x64\" >nul 2>&1
-copy /Y "bin\Release\x64\net8.0\CSharpDLL.deps.json" "x64\" >nul 2>&1
-if exist "bin\Release\x64\net8.0\CSharpDLL.comhost.dll" copy /Y "bin\Release\x64\net8.0\CSharpDLL.comhost.dll" "x64\" >nul 2>&1
+REM 複製 x64 DLL 文件
+if exist "bin\Release\x64\net8.0\CSharpDLL.dll" (
+    copy /Y "bin\Release\x64\net8.0\CSharpDLL.dll" "x64\" >nul 2>&1
+    copy /Y "bin\Release\x64\net8.0\CSharpDLL.runtimeconfig.json" "x64\" >nul 2>&1
+    copy /Y "bin\Release\x64\net8.0\CSharpDLL.deps.json" "x64\" >nul 2>&1
+    if exist "bin\Release\x64\net8.0\CSharpDLL.comhost.dll" copy /Y "bin\Release\x64\net8.0\CSharpDLL.comhost.dll" "x64\" >nul 2>&1
+    echo 已複製 x64 DLL 文件
+) else (
+    echo 警告: 找不到 x64 DLL 文件
+)
 
-copy /Y "bin\Release\x86\net8.0\CSharpDLL.dll" "x86\" >nul 2>&1
-copy /Y "bin\Release\x86\net8.0\CSharpDLL.runtimeconfig.json" "x86\" >nul 2>&1
-copy /Y "bin\Release\x86\net8.0\CSharpDLL.deps.json" "x86\" >nul 2>&1
-if exist "bin\Release\x86\net8.0\CSharpDLL.comhost.dll" copy /Y "bin\Release\x86\net8.0\CSharpDLL.comhost.dll" "x86\" >nul 2>&1
+REM 複製 x86 DLL 文件
+if exist "bin\Release\x86\net8.0\CSharpDLL.dll" (
+    copy /Y "bin\Release\x86\net8.0\CSharpDLL.dll" "x86\" >nul 2>&1
+    copy /Y "bin\Release\x86\net8.0\CSharpDLL.runtimeconfig.json" "x86\" >nul 2>&1
+    copy /Y "bin\Release\x86\net8.0\CSharpDLL.deps.json" "x86\" >nul 2>&1
+    if exist "bin\Release\x86\net8.0\CSharpDLL.comhost.dll" copy /Y "bin\Release\x86\net8.0\CSharpDLL.comhost.dll" "x86\" >nul 2>&1
+    echo 已複製 x86 DLL 文件
+) else (
+    echo 警告: 找不到 x86 DLL 文件
+)
 
 echo 已複製 DLL 到 x64 和 x86 目錄
 echo.

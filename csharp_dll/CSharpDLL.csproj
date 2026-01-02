@@ -4,11 +4,23 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <EnableComHosting>true</EnableComHosting>
-    <EnableRegFreeCom>true</EnableRegFreeCom>
     <Platforms>x64;x86</Platforms>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+
+  <!-- 64 位配置：啟用 COM 支持 -->
+  <PropertyGroup Condition="'$(Platform)' == 'x64'">
+    <PlatformTarget>x64</PlatformTarget>
+    <EnableComHosting>true</EnableComHosting>
+    <EnableRegFreeCom>true</EnableRegFreeCom>
+  </PropertyGroup>
+
+  <!-- 32 位配置：禁用 COM 支持（避免 COM 主機問題） -->
+  <PropertyGroup Condition="'$(Platform)' == 'x86'">
+    <PlatformTarget>x86</PlatformTarget>
+    <EnableComHosting>false</EnableComHosting>
+    <EnableRegFreeCom>false</EnableRegFreeCom>
   </PropertyGroup>
 
   <!-- 64 位配置 -->

@@ -9,6 +9,14 @@ import sys
 import os
 import platform
 
+# 重要：必須在 import clr 之前加載 coreclr（適用於 .NET 6+）
+try:
+    from pythonnet import load
+    load("coreclr")
+except ImportError:
+    # 如果 pythonnet 版本較舊，直接使用 clr
+    pass
+
 try:
     import clr
 except ImportError:
