@@ -6,7 +6,7 @@ namespace CSharpCallPythonDLL
 {
     class Program
     {
-        // 根據運行時架構選擇 DLL
+        // 獲取 DLL 路徑（僅支援 64 位）
         private static string GetDllPath()
         {
             string baseDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
@@ -16,42 +16,12 @@ namespace CSharpCallPythonDLL
             }
             
             // 回到 python_wrapper/cpp_binding 目錄
-            baseDir = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "cpp_binding"));
+            baseDir = Path.GetFullPath(Path.Combine(baseDir, "..", "..", "..", "cpp_binding"));
             
-            // 檢測運行時架構
-            bool is64Bit = Environment.Is64BitProcess;
+            string dllPath = Path.Combine(baseDir, "x64", "PythonBridge.dll");
             
-            string dllDir;
-            string arch;
-            
-            if (is64Bit)
-            {
-                dllDir = Path.Combine(baseDir, "x64");
-                arch = "64位";
-            }
-            else
-            {
-                dllDir = Path.Combine(baseDir, "x86");
-                arch = "32位";
-            }
-            
-            string dllPath = Path.Combine(dllDir, "PythonBridge.dll");
-            
-            // 如果架構目錄中沒有，嘗試 build 目錄
-            if (!File.Exists(dllPath))
-            {
-                if (is64Bit)
-                {
-                    dllPath = Path.Combine(baseDir, "build_x64", "Release", "PythonBridge.dll");
-                }
-                else
-                {
-                    dllPath = Path.Combine(baseDir, "build_x86", "Release", "PythonBridge.dll");
-                }
-            }
-            
-            Console.WriteLine($"運行時架構: {(is64Bit ? "64位" : "32位")}");
-            Console.WriteLine($"使用 DLL: {dllPath} ({arch})");
+            Console.WriteLine("運行時架構: 64位");
+            Console.WriteLine($"使用 DLL: {dllPath}");
             Console.WriteLine();
             
             return dllPath;

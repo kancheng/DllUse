@@ -51,30 +51,23 @@ std::string GetDllPath()
         arch = "32bit";
     }
     
-    std::string dllPath = dllDir + "\\CSharpDLL.dll";
-    
-    // 優先使用 bin 目錄中的 DLL（包含所有依賴）
+    // 優先使用 net48 版本（與 .NET Framework CLR 兼容）
+    std::string dllPath;
     if (is64Bit)
     {
-        std::string binPath = baseDir + "\\bin\\Release\\x64\\net8.0\\CSharpDLL.dll";
-        if (GetFileAttributesA(binPath.c_str()) != INVALID_FILE_ATTRIBUTES)
+        dllPath = baseDir + "\\x64\\net48\\CSharpDLL.dll";
+        if (GetFileAttributesA(dllPath.c_str()) == INVALID_FILE_ATTRIBUTES)
         {
-            dllPath = binPath;
+            dllPath = baseDir + "\\bin\\Release\\x64\\net48\\CSharpDLL.dll";
         }
     }
     else
     {
-        std::string binPath = baseDir + "\\bin\\Release\\x86\\net8.0\\CSharpDLL.dll";
-        if (GetFileAttributesA(binPath.c_str()) != INVALID_FILE_ATTRIBUTES)
+        dllPath = baseDir + "\\x86\\net48\\CSharpDLL.dll";
+        if (GetFileAttributesA(dllPath.c_str()) == INVALID_FILE_ATTRIBUTES)
         {
-            dllPath = binPath;
+            dllPath = baseDir + "\\bin\\Release\\x86\\net48\\CSharpDLL.dll";
         }
-    }
-    
-    // 如果 bin 目錄中沒有，嘗試架構目錄
-    if (GetFileAttributesA(dllPath.c_str()) == INVALID_FILE_ATTRIBUTES)
-    {
-        dllPath = dllDir + "\\CSharpDLL.dll";
     }
     
     std::cout << "Runtime Architecture: " << (is64Bit ? "64-bit" : "32-bit") << std::endl;

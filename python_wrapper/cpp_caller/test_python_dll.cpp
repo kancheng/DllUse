@@ -1,4 +1,4 @@
-// C++ 調用 Python 封裝 DLL 範例（支持 32 位和 64 位）
+// C++ Calling Python Bridge DLL Example (64-bit only)
 
 #include <windows.h>
 #include <iostream>
@@ -14,7 +14,7 @@ extern "C" {
     __declspec(dllimport) const char* PythonGetVersion();
 }
 
-// 根據運行時架構選擇 DLL
+// 獲取 DLL 路徑（僅支援 64 位）
 std::string GetDllPath()
 {
     // 獲取當前可執行文件目錄
@@ -26,49 +26,15 @@ std::string GetDllPath()
     
     // 回到 python_wrapper/cpp_binding 目錄
     pos = exeDir.find_last_of("\\/");
-    std::string baseDir = exeDir.substr(0, pos);
-    pos = baseDir.find_last_of("\\/");
-    baseDir = baseDir.substr(0, pos);
+    std::string callerDir = exeDir.substr(0, pos);
+    pos = callerDir.find_last_of("\\/");
+    std::string baseDir = callerDir.substr(0, pos);
     baseDir = baseDir + "\\cpp_binding";
     
-    // 檢測運行時架構
-    #ifdef _WIN64
-        bool is64Bit = true;
-    #else
-        bool is64Bit = false;
-    #endif
+    std::string dllPath = baseDir + "\\x64\\PythonBridge.dll";
     
-    std::string dllDir;
-    std::string arch;
-    
-    if (is64Bit)
-    {
-        dllDir = baseDir + "\\x64";
-        arch = "64位";
-    }
-    else
-    {
-        dllDir = baseDir + "\\x86";
-        arch = "32位";
-    }
-    
-    std::string dllPath = dllDir + "\\PythonBridge.dll";
-    
-    // 如果架構目錄中沒有，嘗試 build 目錄
-    if (GetFileAttributesA(dllPath.c_str()) == INVALID_FILE_ATTRIBUTES)
-    {
-        if (is64Bit)
-        {
-            dllPath = baseDir + "\\build_x64\\Release\\PythonBridge.dll";
-        }
-        else
-        {
-            dllPath = baseDir + "\\build_x86\\Release\\PythonBridge.dll";
-        }
-    }
-    
-    std::cout << "運行時架構: " << (is64Bit ? "64位" : "32位") << std::endl;
-    std::cout << "使用 DLL: " << dllPath << " (" << arch << ")" << std::endl;
+    std::cout << "Runtime Architecture: 64-bit" << std::endl;
+    std::cout << "Using DLL: " << dllPath << std::endl;
     std::cout << std::endl;
     
     return dllPath;
@@ -76,7 +42,7 @@ std::string GetDllPath()
 
 int main()
 {
-    std::cout << "=== C++ 調用 Python 封裝 DLL 範例 ===" << std::endl << std::endl;
+    std::cout << "=== C++ Calling Python Bridge DLL Example ===" << std::endl << std::endl;
     
     // 獲取 DLL 路徑
     std::string dllPath = GetDllPath();
@@ -84,8 +50,8 @@ int main()
     // 檢查文件是否存在
     if (GetFileAttributesA(dllPath.c_str()) == INVALID_FILE_ATTRIBUTES)
     {
-        std::cout << "錯誤: 找不到 DLL: " << dllPath << std::endl;
-        std::cout << "請確保已編譯 Python Bridge DLL（運行 build_dll.bat）" << std::endl;
+        std::cout << "Error: Cannot find DLL: " << dllPath << std::endl;
+        std::cout << "Please ensure Python Bridge DLL is compiled (run build_dll.bat)" << std::endl;
         return 1;
     }
     
@@ -93,8 +59,8 @@ int main()
     HMODULE hModule = LoadLibraryA(dllPath.c_str());
     if (hModule == NULL)
     {
-        std::cout << "錯誤: 無法加載 DLL: " << dllPath << std::endl;
-        std::cout << "錯誤代碼: " << GetLastError() << std::endl;
+        std::cout << "Error: Cannot load DLL: " << dllPath << std::endl;
+        std::cout << "Error code: " << GetLastError() << std::endl;
         return 1;
     }
     
@@ -115,7 +81,7 @@ int main()
     
     if (!InitializePython || !FinalizePython || !PythonAdd || !PythonSubtract || !PythonMultiply || !PythonGetVersion)
     {
-        std::cout << "錯誤: 無法獲取 DLL 函數地址" << std::endl;
+        std::cout << "Error: Cannot get DLL function addresses" << std::endl;
         FreeLibrary(hModule);
         return 1;
     }
@@ -123,7 +89,7 @@ int main()
     // 初始化 Python 解釋器
     int init_result = InitializePython();
     if (init_result < 0) {
-        std::cerr << "錯誤：無法初始化 Python 解釋器" << std::endl;
+        std::cerr << "Error: Cannot initialize Python interpreter" << std::endl;
         FreeLibrary(hModule);
         return 1;
     }
@@ -145,7 +111,7 @@ int main()
     }
     catch (...)
     {
-        std::cerr << "錯誤：調用 Python 函數時發生異常" << std::endl;
+        std::cerr << "Error: Exception occurred while calling Python functions" << std::endl;
     }
     
     // 清理 Python 解釋器
@@ -154,7 +120,7 @@ int main()
     // 釋放 DLL
     FreeLibrary(hModule);
     
-    std::cout << std::endl << "測試完成！" << std::endl;
+    std::cout << std::endl << "Test completed!" << std::endl;
     
     return 0;
 }
