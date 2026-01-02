@@ -37,14 +37,22 @@ std::string GetDllPath()
     
     std::string dllPath;
     if (is64Bit) {
-        dllPath = baseDir + "\\bin\\Release\\x64\\net8.0\\CSharpDLL.dll";
+        // 優先使用 net48 版本（與 .NET Framework CLR 兼容）
+        dllPath = baseDir + "\\x64\\net48\\CSharpDLL.dll";
         if (GetFileAttributesA(dllPath.c_str()) == INVALID_FILE_ATTRIBUTES) {
-            dllPath = baseDir + "\\x64\\CSharpDLL.dll";
+            dllPath = baseDir + "\\x64\\CSharpDLL.dll";  // 應該指向 net48
+        }
+        if (GetFileAttributesA(dllPath.c_str()) == INVALID_FILE_ATTRIBUTES) {
+            dllPath = baseDir + "\\bin\\Release\\x64\\net48\\CSharpDLL.dll";
         }
     } else {
-        dllPath = baseDir + "\\bin\\Release\\x86\\net8.0\\CSharpDLL.dll";
+        // 優先使用 net48 版本
+        dllPath = baseDir + "\\x86\\net48\\CSharpDLL.dll";
         if (GetFileAttributesA(dllPath.c_str()) == INVALID_FILE_ATTRIBUTES) {
-            dllPath = baseDir + "\\x86\\CSharpDLL.dll";
+            dllPath = baseDir + "\\x86\\CSharpDLL.dll";  // 應該指向 net48
+        }
+        if (GetFileAttributesA(dllPath.c_str()) == INVALID_FILE_ATTRIBUTES) {
+            dllPath = baseDir + "\\bin\\Release\\x86\\net48\\CSharpDLL.dll";
         }
     }
     
@@ -85,6 +93,9 @@ int main()
             return 1;
         }
         
+        // 先宣告，避免作用域造成的未声明标识符错误
+        array<Exception^>^ loaderExs = nullptr;
+
         // 使用反射獲取類型 - 使用完整類型名
         Type^ calcType = nullptr;
         try {
@@ -134,7 +145,7 @@ int main()
                 }
                 
                 // 打印 LoaderExceptions（關鍵！）
-                array<Exception^>^ loaderExs = rtle->LoaderExceptions;
+                loaderExs = rtle->LoaderExceptions;
                 if (loaderExs != nullptr && loaderExs->Length > 0) {
                     std::wcout << L"LoaderExceptions (" << loaderExs->Length << L"):" << std::endl;
                     for (int i = 0; i < loaderExs->Length && i < 5; i++) {
@@ -230,4 +241,3 @@ int main()
     
     return 0;
 }
-

@@ -1,36 +1,33 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+    <!-- Multi-target: net8.0 給 COM/LabVIEW，net48 給 Python/C++/CLI -->
+    <TargetFrameworks>net8.0;net48</TargetFrameworks>
+    <ImplicitUsings Condition="'$(TargetFramework)' == 'net8.0'">enable</ImplicitUsings>
+    <Nullable Condition="'$(TargetFramework)' == 'net8.0'">enable</Nullable>
     <Platforms>x64;x86</Platforms>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-  </PropertyGroup>
-
-  <!-- 64 位配置：啟用 COM 支持 -->
-  <PropertyGroup Condition="'$(Platform)' == 'x64'">
-    <PlatformTarget>x64</PlatformTarget>
-    <EnableComHosting>true</EnableComHosting>
-    <EnableRegFreeCom>true</EnableRegFreeCom>
-  </PropertyGroup>
-
-  <!-- 32 位配置：禁用 COM 支持（避免 COM 主機問題） -->
-  <PropertyGroup Condition="'$(Platform)' == 'x86'">
-    <PlatformTarget>x86</PlatformTarget>
-    <EnableComHosting>false</EnableComHosting>
-    <EnableRegFreeCom>false</EnableRegFreeCom>
+    
+    <!-- 定義條件編譯符號 -->
+    <DefineConstants Condition="'$(TargetFramework)' == 'net8.0'">NET8_0;COM_EXPORT</DefineConstants>
+    <DefineConstants Condition="'$(TargetFramework)' == 'net48'">NET48</DefineConstants>
   </PropertyGroup>
 
   <!-- 64 位配置 -->
   <PropertyGroup Condition="'$(Platform)' == 'x64'">
     <PlatformTarget>x64</PlatformTarget>
+    <!-- 只有 net8.0 + x64 啟用 COM -->
+    <EnableComHosting Condition="'$(TargetFramework)' == 'net8.0'">true</EnableComHosting>
+    <EnableRegFreeCom Condition="'$(TargetFramework)' == 'net8.0'">true</EnableRegFreeCom>
   </PropertyGroup>
 
   <!-- 32 位配置 -->
   <PropertyGroup Condition="'$(Platform)' == 'x86'">
     <PlatformTarget>x86</PlatformTarget>
+    <!-- x86 不啟用 COM（避免 COM 主機問題） -->
+    <EnableComHosting>false</EnableComHosting>
+    <EnableRegFreeCom>false</EnableRegFreeCom>
   </PropertyGroup>
 
 </Project>
