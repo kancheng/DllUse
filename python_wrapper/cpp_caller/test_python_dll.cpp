@@ -4,16 +4,6 @@
 #include <iostream>
 #include <string>
 
-// 導入 Python 橋接 DLL 的函數
-extern "C" {
-    __declspec(dllimport) int InitializePython();
-    __declspec(dllimport) void FinalizePython();
-    __declspec(dllimport) int PythonAdd(int a, int b);
-    __declspec(dllimport) int PythonSubtract(int a, int b);
-    __declspec(dllimport) int PythonMultiply(int a, int b);
-    __declspec(dllimport) const char* PythonGetVersion();
-}
-
 // 獲取 DLL 路徑（僅支援 64 位）
 std::string GetDllPath()
 {
@@ -56,6 +46,7 @@ int main()
     }
     
     // 加載 DLL
+    std::cout << "[DEBUG] Loading DLL..." << std::endl;
     HMODULE hModule = LoadLibraryA(dllPath.c_str());
     if (hModule == NULL)
     {
@@ -63,8 +54,10 @@ int main()
         std::cout << "Error code: " << GetLastError() << std::endl;
         return 1;
     }
+    std::cout << "[OK] LoadLibrary success" << std::endl;
     
     // 獲取函數指針
+    std::cout << "[DEBUG] Getting function addresses..." << std::endl;
     typedef int (*InitFunc)();
     typedef void (*FinalizeFunc)();
     typedef int (*AddFunc)(int, int);
@@ -85,14 +78,18 @@ int main()
         FreeLibrary(hModule);
         return 1;
     }
+    std::cout << "[OK] All function addresses retrieved" << std::endl;
     
     // 初始化 Python 解釋器
+    std::cout << "[CALL] InitializePython..." << std::endl;
     int init_result = InitializePython();
-    if (init_result < 0) {
-        std::cerr << "Error: Cannot initialize Python interpreter" << std::endl;
+    std::cout << "[RET] InitializePython = " << init_result << std::endl;
+    if (init_result != 1) {
+        std::cerr << "Error: Cannot initialize Python interpreter (expected 1, got " << init_result << ")" << std::endl;
         FreeLibrary(hModule);
         return 1;
     }
+    std::cout << "[OK] Python interpreter initialized successfully" << std::endl;
     
     try
     {

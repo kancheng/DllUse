@@ -94,7 +94,7 @@ for %%f in ("%PYTHON_LIB_FILE%") do set PYTHON_LIB_NAME=%%~nxf
 
 echo 使用 Python 庫: %PYTHON_LIB_FILE%
 echo 編譯 64 位 DLL...
-cl /LD /MD /O2 /EHsc /I"%PYTHON_INCLUDE%" /I"%PYBIND11_DIR%\include" python_bridge.cpp /Fe:x64\PythonBridge.dll /link /LIBPATH:"%PYTHON_LIBS_DIR%" "%PYTHON_LIB_NAME%" /OUT:x64\PythonBridge.dll
+cl /LD /MD /O2 /EHsc /utf-8 /I"%PYTHON_INCLUDE%" /I"%PYBIND11_DIR%\include" python_bridge.cpp /Fe:x64\PythonBridge.dll /link /LIBPATH:"%PYTHON_LIBS_DIR%" "%PYTHON_LIB_NAME%" /OUT:x64\PythonBridge.dll
 
 if errorlevel 1 (
     echo.

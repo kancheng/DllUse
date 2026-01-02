@@ -27,39 +27,70 @@ static bool EnsurePythonInitialized()
     
     try {
         if (!Py_IsInitialized()) {
-            // 設置 Python 模組搜索路徑
-            // 獲取當前 DLL 所在目錄
+            // 先初始化 Python 解釋器（必須在 import 之前）
+            py::initialize_interpreter();
+            python_initialized = true;
+            
+            // 獲取當前 DLL 所在目錄，用於設置 Python 模組搜索路徑
             char dllPath[MAX_PATH];
             HMODULE hModule = NULL;
+            std::string dllDir;
+            std::string rootDir;
             if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
                                    (LPSTR)&EnsurePythonInitialized, &hModule)) {
                 GetModuleFileNameA(hModule, dllPath, MAX_PATH);
-                std::string dllDir = dllPath;
+                dllDir = dllPath;
                 size_t pos = dllDir.find_last_of("\\/");
                 if (pos != std::string::npos) {
+                    // dllDir = ...\cpp_binding\x64
                     dllDir = dllDir.substr(0, pos);
-                    // 回到 python_wrapper 目錄
+                    // 回到 cpp_binding 目錄
                     pos = dllDir.find_last_of("\\/");
                     if (pos != std::string::npos) {
-                        dllDir = dllDir.substr(0, pos);
-                        // 將 python_wrapper 目錄添加到 Python 路徑
-                        py::module_ sys = py::module_::import("sys");
-                        sys.attr("path").attr("append")(dllDir);
+                        std::string cppBindingDir = dllDir.substr(0, pos);
+                        // rootDir = ...\python_wrapper (專案根目錄)
+                        pos = cppBindingDir.find_last_of("\\/");
+                        if (pos != std::string::npos) {
+                            rootDir = cppBindingDir.substr(0, pos);
+                        }
                     }
                 }
             }
             
-            py::initialize_interpreter();
-            python_initialized = true;
-            
-            // 預加載 math_module
-            try {
-                cached_math_module = py::module_::import("math_module");
-            } catch (...) {
-                // 如果無法加載，稍後再試
+            // 現在可以安全地 import sys 並設置路徑
+            bool pathSet = false;
+            if (!rootDir.empty()) {
+                try {
+                    py::gil_scoped_acquire gil;
+                    py::module_ sys = py::module_::import("sys");
+                    // 加入專案根目錄（math_module.py 所在位置）
+                    sys.attr("path").attr("append")(rootDir);
+                    // 可選：也加入 DLL 目錄
+                    if (!dllDir.empty()) {
+                        sys.attr("path").attr("append")(dllDir);
+                    }
+                    pathSet = true;
+                } catch (const std::exception& e) {
+                    std::cerr << "Warning: Failed to set Python path: " << e.what() << std::endl;
+                }
             }
             
-            return true;
+            // 預加載 math_module（必須成功才能返回 true）
+            bool moduleLoaded = false;
+            if (pathSet) {
+                try {
+                    py::gil_scoped_acquire gil;
+                    cached_math_module = py::module_::import("math_module");
+                    moduleLoaded = true;
+                } catch (const std::exception& e) {
+                    std::cerr << "Error: Failed to load math_module: " << e.what() << std::endl;
+                    std::cerr << "  Root directory: " << rootDir << std::endl;
+                    std::cerr << "  DLL directory: " << dllDir << std::endl;
+                }
+            }
+            
+            // 只有當 path 設置成功且 math_module 成功加載時才返回 true
+            return pathSet && moduleLoaded;
         }
         return true;
     } catch (const std::exception& e) {
@@ -74,26 +105,34 @@ static bool EnsurePythonInitialized()
 // 導出 C 風格的函數接口
 extern "C" {
     // 初始化 Python 解釋器
+    // 返回值：1 = 成功（Python init + math_module import 成功），0 = 失敗
     __declspec(dllexport) int InitializePython()
     {
         if (EnsurePythonInitialized()) {
-            return 0; // 成功
+            return 1; // 成功
         }
-        return -1; // 失敗
+        return 0; // 失敗
     }
     
     // 清理 Python 解釋器
     __declspec(dllexport) void FinalizePython()
     {
         std::lock_guard<std::mutex> lock(python_mutex);
-        if (Py_IsInitialized()) {
-            try {
-                cached_math_module = py::module_();
-                py::finalize_interpreter();
-                python_initialized = false;
-            } catch (...) {
-                // 忽略清理錯誤
-            }
+        
+        if (!Py_IsInitialized()) return;
+        
+        try {
+            // 1) 先在 GIL scope 內釋放所有 py::object
+            {
+                py::gil_scoped_acquire gil;
+                cached_math_module = py::module_();  // release
+            } // <-- GIL 在這裡正常釋放（Python 還活著）
+            
+            // 2) 再關閉 interpreter
+            py::finalize_interpreter();
+            python_initialized = false;
+        } catch (...) {
+            // 忽略或印 log 都行
         }
     }
     
@@ -106,6 +145,7 @@ extern "C" {
         
         try {
             std::lock_guard<std::mutex> lock(python_mutex);
+            py::gil_scoped_acquire gil;
             
             // 如果模組未加載，嘗試加載
             if (cached_math_module.is_none()) {
@@ -132,6 +172,7 @@ extern "C" {
         
         try {
             std::lock_guard<std::mutex> lock(python_mutex);
+            py::gil_scoped_acquire gil;
             
             if (cached_math_module.is_none()) {
                 cached_math_module = py::module_::import("math_module");
@@ -157,6 +198,7 @@ extern "C" {
         
         try {
             std::lock_guard<std::mutex> lock(python_mutex);
+            py::gil_scoped_acquire gil;
             
             if (cached_math_module.is_none()) {
                 cached_math_module = py::module_::import("math_module");
@@ -184,6 +226,7 @@ extern "C" {
         
         try {
             std::lock_guard<std::mutex> lock(python_mutex);
+            py::gil_scoped_acquire gil;
             
             if (cached_math_module.is_none()) {
                 cached_math_module = py::module_::import("math_module");
